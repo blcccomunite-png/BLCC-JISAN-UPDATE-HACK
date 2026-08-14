@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, user-scalable=no" name="viewport">
+    <title>𝐉𝐈𝐒𝐀𝐍//𝐁𝐋𝐂𝐂//𝐖𝐎𝐍𝐄𝐑</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            font-family: 'Orbitron', 'Segoe UI', Arial, sans-serif;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
+
+        /* === LIVE GAME IFRAME BACKGROUND === */
+        #bgFrame {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            z-index: 1;
+            background: #000911;
+        }
+
+        /* === DRAGGABLE HACKER WIDGET === */
+        #topBox {
+            position: fixed;
+            top: 25%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 170px;
+            height: 170px;
+            z-index: 99999;
+            cursor: move;
+            touch-action: none;
+            background: url('images/1hj11n.jpg') no-repeat center center;
+            background-size: cover;
+            border-radius: 50%;
+            box-shadow: 0 0 15px rgba(0, 245, 160, 0.4);
+            overflow: hidden;
+        }
+
+        /* === ভিডিও ব্যাকগ্রাউন্ড (পুরো বৃত্ত জুড়ে কভার) === */
+        #predVideoBg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+            pointer-events: none;
+            border-radius: 50%;
+        }
+
+        .hex-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            gap: 3px;
+            padding: 0 15px;
+            z-index: 2;
+        }
+
+        #loginDiv {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-get-pass {
+            width: 90%;
+            padding: 4px;
+            background: linear-gradient(135deg, #00f5a0, #00b375);
+            border: 1px solid #fff;
+            border-radius: 3px;
+            color: #000;
+            font-weight: 900;
+            font-size: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            pointer-events: auto;
+            box-shadow: 0 0 6px rgba(0, 245, 160, 0.6);
+            margin-bottom: 1px;
+        }
+        .btn-get-pass:active {
+            transform: scale(0.95);
+        }
+
+        input {
+            width: 90%;
+            padding: 4px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #f5b81b;
+            color: #fff;
+            border-radius: 3px;
+            text-align: center;
+            font-size: 9px;
+            outline: none;
+            cursor: text;
+            font-weight: bold;
+            pointer-events: auto;
+        }
+
+        .btn-small {
+            width: 90%;
+            padding: 4px;
+            background: linear-gradient(135deg, #f5b81b, #b7860b);
+            border: 1px solid #fff;
+            border-radius: 3px;
+            color: #000;
+            font-weight: 900;
+            font-size: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            pointer-events: auto;
+            box-shadow: 0 0 4px rgba(245, 184, 27, 0.5);
+        }
+        .btn-small:active {
+            transform: scale(0.95);
+        }
+
+        .error-text {
+            color: #ff4d6d;
+            font-size: 7px;
+            height: 8px;
+            font-weight: bold;
+        }
+
+        .pred-info {
+            display: none;
+            width: 100%;
+        }
+
+        /* === TITLE TEXT STYLE === */
+        .title-text {
+            font-size: 8px;
+            font-weight: 900;
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 2px 5px;
+            border-radius: 5px;
+            text-shadow: 0 0 4px #000, 0 0 8px #000;
+            margin-bottom: 2px;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 98%;
+        }
+
+        .timer {
+            font-family: 'Orbitron', 'Courier New', monospace;
+            font-size: 18px;
+            font-weight: 900;
+            color: #00ffcc;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 0 5px;
+            border-radius: 5px;
+            text-shadow: 0 0 8px #000, 0 0 12px #00ffcc;
+            letter-spacing: 1px;
+            line-height: 1;
+            margin: 0 0 2px 0;
+            display: block;
+            text-align: center;
+        }
+
+        .result {
+            font-size: 20px;
+            font-weight: 900;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            letter-spacing: 1px;
+            color: #fff;
+            text-transform: uppercase;
+            line-height: 1;
+            margin: 0;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 2px 6px;
+            border-radius: 4px;
+            animation: textPulse 0.8s infinite alternate;
+        }
+
+        @keyframes textPulse {
+            0% {
+                transform: scale(0.96);
+            }
+            100% {
+                transform: scale(1.04);
+            }
+        }
+
+        /* === PREDICTION COLOR BALL === */
+        .color-ball {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            margin: 3px auto 0;
+            background: #00ff88;
+            box-shadow: 0 0 12px #00ff88, 0 0 18px #00ff88;
+            animation: ballPulse 0.8s infinite alternate;
+        }
+
+        @keyframes ballPulse {
+            0% {
+                transform: scale(0.7);
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(1.25);
+                opacity: 1;
+            }
+        }
+
+        /* === SOUND TOGGLE BUTTON === */
+        #soundToggle {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            z-index: 10;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            border: 1px solid #00f5a0;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            line-height: 1;
+            pointer-events: auto;
+            box-shadow: 0 0 8px rgba(0, 245, 160, 0.5);
+            touch-action: manipulation;
+        }
+        #soundToggle:active {
+            transform: scale(0.9);
+        }
+
+        .scanner-line {
+            display: none;
+            position: fixed;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(to right, transparent, #00f5a0, #f5b81b, #00f5a0, transparent);
+            box-shadow: 0 0 20px #00f5a0, 0 0 35px #f5b81b;
+            z-index: 100000;
+            pointer-events: none;
+            animation: globalScanAnim 1.6s ease-in-out infinite alternate;
+        }
+
+        @keyframes globalScanAnim {
+            0% {
+                top: 0%;
+            }
+            100% {
+                top: 100%;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        s-eto {
+            display: inline !important
+        }
+        s-eto::before {
+            content: ''
+        }
+        #s1::before {
+            content: "\9aa \9be \9b8 \993 \9af \9bc \9be \9b0 \9cd \9a1 \20 \9a8 \9bf \9a8 "
+        }
+        #s2::before {
+            content: "\55 \4e \4c \4f \43 \4b "
+        }
+        #s4::before {
+            content: "\33 \30 "
+        }
+    </style>
+</head>
+<body onclick="AudioEngine.unlockAudio()" ontouchstart="AudioEngine.unlockAudio()">
+
+    <iframe id="bgFrame" src="https://deshclub2.com/#/register?invitationCode=65241158612"></iframe>
+    <div class="scanner-line" id="scanner"></div>
+
+    <div id="topBox">
+        <!-- ভিডিও পুরো বৃত্ত জুড়ে কভার -->
+        <video id="predVideoBg" autoplay loop playsinline preload="auto">
+            <source src="2026-08-13-012916466.mp4" type="video/mp4">
+        </video>
+        <button id="soundToggle" title="Sound On/Off">🔊</button>
+        <div class="hex-content">
+            <div id="loginDiv">
+                <button class="btn-get-pass" onclick="goToOwner()"><s-eto id="s1"></s-eto></button>
+
+                <input id="passInput" onfocus="playWelcomeImmediate()" onkeypress="handleEnter(event)" onmousedown="playWelcomeImmediate()" ontouchstart="playWelcomeImmediate()" placeholder="VIP PASS" type="password">
+                <button class="btn-small" onclick="checkPass()"><s-eto id="s2"></s-eto></button>
+                <div class="error-text" id="err"></div>
+            </div>
+            <div class="pred-info" id="predDiv">
+                <div class="title-text" id="titleText">𝐉𝐈𝐒𝐀𝐍//𝐁𝐋𝐂𝐂//𝐖𝐎𝐍𝐄𝐑</div>
+                <div class="timer" id="timer"><s-eto id="s4"></s-eto></div>
+                <div class="result" id="result"></div>
+                <div class="color-ball" id="colorBall"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // === CHANNEL LINKS ===
+        const OWNER_TELEGRAM = "https://t.me/DSK_QUASARS";
+        const TELEGRAM_GROUP = "https://t.me/DSK_QUASARS";
+
+        const loginDiv = document.getElementById('loginDiv');
+        const predDiv = document.getElementById('predDiv');
+        const errBox = document.getElementById('err');
+        const timerEl = document.getElementById('timer');
+        const resultEl = document.getElementById('result');
+        const colorBall = document.getElementById('colorBall');
+        const topBox = document.getElementById('topBox');
+        const scanner = document.getElementById('scanner');
+        const predVideoBg = document.getElementById('predVideoBg');
+        const soundToggle = document.getElementById('soundToggle');
+
+        let lastSec = -1;
+        let isScanning = false;
+        let hasWelcomed = false;
+        let stepVoiceInterval = null;
+        let soundEnabled = true;
+
+        function updateSoundIcon() {
+            if (soundToggle) {
+                soundToggle.textContent = soundEnabled ? '🔊' : '🔇';
+            }
+        }
+
+        function setVideoMutedState() {
+            if (predVideoBg) {
+                predVideoBg.muted = !soundEnabled;
+            }
+        }
+
+        updateSoundIcon();
+
+        // === ভিডিও অডিও সহ প্লে (গান শোনা যাবে) ===
+        function playVideoWithAudio() {
+            if (predVideoBg) {
+                setVideoMutedState();
+                predVideoBg.loop = true;
+                predVideoBg.playsInline = true;
+                
+                const playPromise = predVideoBg.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => {
+                        document.addEventListener('click', resumeVideoOnGesture, { once: true });
+                        document.addEventListener('touchstart', resumeVideoOnGesture, { once: true });
+                    });
+                }
+            }
+        }
+
+        function resumeVideoOnGesture() {
+            if (predVideoBg && predVideoBg.paused) {
+                setVideoMutedState();
+                predVideoBg.play().catch(() => {});
+            }
+        }
+
+        playVideoWithAudio();
+
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && predVideoBg && predVideoBg.paused) {
+                setVideoMutedState();
+                predVideoBg.play().catch(() => {});
+            }
+        });
+
+        // === অডিও ইঞ্জিন (স্পিচ) ===
+        const AudioEngine = {
+            isUnlocked: false,
+            voices: [],
+
+            init() {
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.onvoiceschanged = () => {
+                        this.voices = window.speechSynthesis.getVoices();
+                    };
+                }
+            },
+
+            unlockAudio() {
+                if (!this.isUnlocked && 'speechSynthesis' in window) {
+                    let dummy = new SpeechSynthesisUtterance("");
+                    window.speechSynthesis.speak(dummy);
+                    this.isUnlocked = true;
+                }
+                if (predVideoBg) {
+                    setVideoMutedState();
+                    if (predVideoBg.paused && soundEnabled) {
+                        predVideoBg.play().catch(() => {});
+                    }
+                }
+            },
+
+            speak(text, callback) {
+                if (!('speechSynthesis' in window)) {
+                    if (callback) callback();
+                    return;
+                }
+
+                if (window.speechSynthesis.speaking || window.speechSynthesis.paused) {
+                    window.speechSynthesis.resume();
+                    window.speechSynthesis.cancel();
+                }
+
+                let utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'bn-BD';
+                utterance.rate = 1.0;
+                utterance.pitch = 1.0;
+
+                if (this.voices.length === 0) {
+                    this.voices = window.speechSynthesis.getVoices();
+                }
+                let bnVoice = this.voices.find(v => v.lang.includes('bn') || v.lang.includes('BD'));
+                if (bnVoice) {
+                    utterance.voice = bnVoice;
+                }
+
+                utterance.onend = () => {
+                    if (callback) callback();
+                };
+                utterance.onerror = () => {
+                    if (callback) callback();
+                };
+
+                setTimeout(() => {
+                    window.speechSynthesis.speak(utterance);
+                }, 50);
+            },
+
+            playWelcome() {
+                this.speak("এই হ্যাকটি শুধুমাত্র JISAN ভাইয়ের ডাউনে কাজ করবে তাই অবশ্যই JISAN ভাইয়ের ডাউনে দুন একটি একাউন্ট খুলেনিন");
+            },
+            playDeposit(onComplete) {
+                this.speak(
+                    "JISAN ভাইয়ের এই প্রিমিয়াম হ্যাক ব্যবহার করার আগে অবশ্যই আপনি ৩০০ থেকে ৫০০ টাকা ডিপোজিট করেন তাহলে প্রিমিয়াম সিগন্যাল চলু হবে ডিপোজিট না করে সিগন্যাল নিলে উল্টাপাল্টা সিগন্যাল আসতে পারে তাই আগে অবশ্যই ডিপোজিট করে নেন",
+                    onComplete
+                );
+            },
+            playTradeSignal(signal) {
+                let text = (signal === "BIG") ? "একটি বিগে ট্রেড লাগান" : "একটি স্মল ট্রেড লাগান";
+                this.speak(text);
+            },
+            playStepReminder() {
+                this.speak("অবশ্যে 7 স্টেপ মেন্টেইন করে ট্রেড নিবেন");
+            }
+        };
+
+        AudioEngine.init();
+
+        soundToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            AudioEngine.unlockAudio();
+            soundEnabled = !soundEnabled;
+            setVideoMutedState();
+            updateSoundIcon();
+            if (soundEnabled && predVideoBg && predVideoBg.paused) {
+                predVideoBg.play().catch(() => {});
+            }
+        });
+
+        function playWelcomeImmediate() {
+            AudioEngine.unlockAudio();
+            if (!hasWelcomed) {
+                hasWelcomed = true;
+                AudioEngine.playWelcome();
+            }
+            if (predVideoBg && predVideoBg.paused) {
+                setVideoMutedState();
+                predVideoBg.play().catch(() => {});
+            }
+        }
+
+        function forceRedirect(url) {
+            try {
+                let win = window.open(url, '_blank');
+                if (!win || win.closed || typeof win.closed === 'undefined') {
+                    window.top.location.href = url;
+                }
+            } catch (e) {
+                window.location.href = url;
+            }
+        }
+
+        function goToOwner() {
+            playWelcomeImmediate();
+            setTimeout(() => {
+                forceRedirect(OWNER_TELEGRAM);
+            }, 500);
+        }
+
+        // === পাসওয়ার্ড চেক ===
+        function checkPass() {
+            AudioEngine.unlockAudio();
+            if (predVideoBg && predVideoBg.paused) {
+                setVideoMutedState();
+                predVideoBg.play().catch(() => {});
+            }
+            const val = document.getElementById('passInput').value.trim();
+            if (!val) return;
+
+            errBox.innerText = "VERIFYING...";
+
+            setTimeout(() => {
+                if (val === "JISAN55667") {
+                    errBox.innerText = "";
+                    loginDiv.style.display = 'none';
+                    predDiv.style.display = 'block';
+                    setVideoMutedState();
+                    predVideoBg.play().catch(() => {});
+
+                    AudioEngine.playDeposit(() => {
+                        startLoop();
+                        startStepVoiceLoop();
+                    });
+                } else {
+                    errBox.innerText = "WRONG PASS! REDIRECTING...";
+                    document.getElementById('passInput').value = "";
+
+                    setTimeout(() => {
+                        forceRedirect(TELEGRAM_GROUP);
+                    }, 800);
+                }
+            }, 600);
+        }
+
+        function handleEnter(e) {
+            if (e.key === "Enter") checkPass();
+        }
+
+        function startLoop() {
+            showResult();
+            setInterval(updateLogic, 100);
+        }
+
+        function startStepVoiceLoop() {
+            if (!stepVoiceInterval) {
+                stepVoiceInterval = setInterval(() => {
+                    if (!isScanning) {
+                        AudioEngine.playStepReminder();
+                    }
+                }, 60000);
+            }
+        }
+
+        function updateLogic() {
+            const now = new Date();
+            const s = now.getSeconds();
+
+            if (s !== lastSec) {
+                lastSec = s;
+                let next = s < 30 ? 30 : 60;
+                let left = next - s;
+                timerEl.innerText = left < 10 ? "0" + left : left;
+
+                if (s === 25 || s === 55) {
+                    startMarketScanning();
+                }
+
+                if (s === 0 || s === 30) {
+                    showResult();
+                }
+            }
+        }
+
+        function startMarketScanning() {
+            isScanning = true;
+            scanner.style.display = "block";
+            resultEl.innerText = "SCANNING...";
+            resultEl.style.color = "#ffea00";
+            resultEl.style.textShadow = "0 0 8px #000, 0 0 12px #ffea00";
+        }
+
+        function showResult() {
+            isScanning = false;
+            scanner.style.display = "none";
+
+            const isBig = Math.random() < 0.5;
+            const res = isBig ? "BIG" : "SMALL";
+
+            resultEl.innerText = res;
+            if (res === "BIG") {
+                resultEl.style.color = "#ffd700";
+                resultEl.style.textShadow = "0 0 8px #000, 0 0 15px #ffd700, 0 0 25px #ffae00";
+                colorBall.style.background = "#00ff88";
+                colorBall.style.boxShadow = "0 0 12px #00ff88, 0 0 20px #00ff88";
+            } else {
+                resultEl.style.color = "#ff1744";
+                resultEl.style.textShadow = "0 0 8px #000, 0 0 15px #ff1744, 0 0 25px #d50000";
+                colorBall.style.background = "#ff1744";
+                colorBall.style.boxShadow = "0 0 12px #ff1744, 0 0 20px #ff1744";
+            }
+
+            AudioEngine.playTradeSignal(res);
+        }
+
+        // === ড্র্যাগিং মেকানিজম ===
+        let isDragging = false;
+        let currentX, currentY, initialX, initialY;
+        let xOffset = 0,
+            yOffset = 0;
+
+        topBox.addEventListener("mousedown", dragStart);
+        topBox.addEventListener("mouseup", dragEnd);
+        topBox.addEventListener("mousemove", drag);
+        topBox.addEventListener("touchstart", dragStart, { passive: false });
+        topBox.addEventListener("touchend", dragEnd);
+        topBox.addEventListener("touchmove", drag, { passive: false });
+
+        function dragStart(e) {
+            if (e.target.tagName.toLowerCase() !== "input" && e.target.tagName.toLowerCase() !== "button") {
+                if (e.type === "touchstart") {
+                    initialX = e.touches[0].clientX - xOffset;
+                    initialY = e.touches[0].clientY - yOffset;
+                } else {
+                    initialX = e.clientX - xOffset;
+                    initialY = e.clientY - yOffset;
+                }
+                isDragging = true;
+            }
+        }
+
+        function dragEnd(e) { isDragging = false; }
+
+        function drag(e) {
+            if (isDragging) {
+                e.preventDefault();
+                if (e.type === "touchmove") {
+                    currentX = e.touches[0].clientX - initialX;
+                    currentY = e.touches[0].clientY - initialY;
+                } else {
+                    currentX = e.clientX - initialX;
+                    currentY = e.clientY - initialY;
+                }
+                xOffset = currentX;
+                yOffset = currentY;
+                setTranslate(currentX, currentY, topBox);
+            }
+        }
+
+        function setTranslate(xPos, yPos, el) {
+            el.style.transform = `translate3d(calc(-50% + ${xPos}px), ${yPos}px, 0)`;
+        }
+    </script>
+
+</body>
+</html>
